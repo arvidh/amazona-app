@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { addToCart, removeFromCart } from '../actions/cardActions'
+import { addToCart, removeFromCart } from '../actions/cartActions'
 import MessageBox from '../components/MessageBox'
 
 export default function CartScreen(props) {
@@ -18,7 +18,7 @@ export default function CartScreen(props) {
     const checkoutHandler = () => {
         props.history.push('/signin?redirect=shipping')
     }
-
+    console.log("CartScreen")
     useEffect(() => {
         if (productId) {
             dispatch(addToCart(productId, qty))
@@ -55,8 +55,7 @@ export default function CartScreen(props) {
                                         <select value={item.qty} onChange={e =>  change_quantity(item, e)}>
                                             {[...Array(item.countInStock).keys()].map(x =>
                                                 <option key={x + 1} value={x + 1}>{x + 1}</option>)
-}
-
+                                            }
                                         </select>
                                     </div>
                                     <div>

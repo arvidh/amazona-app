@@ -8,15 +8,20 @@ import { detailsProduct } from '../actions/productActions'
 
 export default function ProductScreen(props){
 
-    console.log("HALLÅ!")
+   
     const dispatch = useDispatch()
     const productId = props.match.params.id
     const [qty, setQty] = useState(1)
     const productDetails = useSelector(state => state.productDetails)
+    console.log("ProductScreen")
+    console.log("productDetails: "+JSON.stringify(productDetails))
     const {loading, error, product} = productDetails
-  
+    
+
     useEffect(() => {
+        console.log("ProductScreen useEffect")
         dispatch(detailsProduct(productId))
+        
     }, [dispatch, productId])
 
     const addToCartHandler = () => {

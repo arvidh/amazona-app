@@ -1,6 +1,6 @@
 import axios from "axios"
 
-import { USER_DETAILS_FAIL, USER_DETAILS_REQUEST, USER_DETAILS_SUCCESS, USER_REGISTER_FAIL, USER_REGISTER_REQUEST, USER_REGISTER_SUCCESS, USER_SIGNIN_FAIL, USER_SIGNIN_REQUEST, USER_SIGNIN_SIGNOUT, USER_SIGNIN_SUCCESS, USER_UPDATE_PROFILE_FAIL, USER_UPDATE_PROFILE_REQUEST, USER_UPDATE_PROFILE_SUCCESS } from "../constants/userConstants"
+import { USER_UPDATE_REQUEST, USER_UPDATE_SUCCESS, USER_UPDATE_FAIL, USER_UPDATE_RESET, USER_DELETE_REQUEST, USER_DELETE_SUCCESS, USER_DELETE_FAIL, USER_LIST_REQUEST, USER_LIST_SUCCESS, USER_LIST_FAIL, USER_DETAILS_FAIL, USER_DETAILS_REQUEST, USER_DETAILS_SUCCESS, USER_REGISTER_FAIL, USER_REGISTER_REQUEST, USER_REGISTER_SUCCESS, USER_SIGNIN_FAIL, USER_SIGNIN_REQUEST, USER_SIGNIN_SIGNOUT, USER_SIGNIN_SUCCESS, USER_UPDATE_PROFILE_FAIL, USER_UPDATE_PROFILE_REQUEST, USER_UPDATE_PROFILE_SUCCESS, USER_TOPSELLERS_REQUEST, USER_TOPSELLERS_SUCCESS, USER_TOPSELLERS_FAIL } from "../constants/userConstants"
 
 export const register = (name, email, password) => async(dispatch) =>{
     dispatch({ type: USER_REGISTER_REQUEST, payload: {name, email, password}})
@@ -59,5 +59,66 @@ export const updateUserProfile = (user) => async (dispatch, getState) => {
     }
     catch (error){
         dispatch({type: USER_UPDATE_PROFILE_FAIL, payload: error.response && error.response.data.message ? error.response.data.message : error.message})
+    }
+}
+
+export const listUsers = () => async (dispatch, getState) => {
+    dispatch ({type: USER_LIST_REQUEST})
+    const {userSignin: {userInfo}} = getState()
+    console.log(JSON.stringify(userInfo))
+    try {
+       
+        const { data } = await axios.get(`/api/users/`, {
+            headers: {Authorization: `Bearer ${userInfo.token}`}
+        })
+        dispatch({ type: USER_LIST_SUCCESS, payload: data})
+    } catch (error){
+        dispatch({type: USER_LIST_FAIL, payload: error.response && error.response.data.message ? error.response.data.message : error.message})
+    }
+}
+
+export const deleteUser = (userId) => async(dispatch, getState) => {
+    dispatch({type: USER_DELETE_REQUEST, payload: userId})
+    const {userSignin: {userInfo}} = getState()
+    try {
+        const {data} = await axios.delete(`/api/users/${userId}`, {
+            headers: { Authorization: `Bearer ${userInfo.token}`}
+        })
+        dispatch ({ type: USER_DELETE_SUCCESS})
+    }
+    catch (error) {
+        dispatch({
+            type: USER_DELETE_FAIL, 
+            payload: error.response && error.response.data.message ?
+                error.response.data.message : error.message
+        })
+    }
+}
+
+export const updateUser = (user) => async(dispatch, getState) => {
+    dispatch({type: USER_UPDATE_REQUEST, payload: user})
+    const {userSignin: {userInfo}} = getState()
+    try {
+        const {data} = await axios.put(`/api/users/${user._id}`, user, {
+            headers: {Authorization: `Bearer ${userInfo.token}`}
+        })
+        dispatch({type: USER_UPDATE_SUCCESS, payload: data})
+    }
+    catch (error){
+        dispatch({
+            type: USER_UPDATE_FAIL, 
+            payload: error.response && error.response.data.message ?
+                error.response.data.message : error.message
+        })
+    }
+}
+
+export const listTopSellers = () => async (dispatch) => {
+    dispatch ({type: USER_TOPSELLERS_REQUEST})
+    try {
+        const { data } = await axios.get(`/api/users/top-sellers`)
+        dispatch({ type: USER_TOPSELLERS_SUCCESS, payload: data})
+    } catch (error){
+        dispatch({type: USER_TOPSELLERS_FAIL, payload: error.response && error.response.data.message ? error.response.data.message : error.message})
     }
 }

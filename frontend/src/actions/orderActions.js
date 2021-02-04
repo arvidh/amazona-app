@@ -56,12 +56,12 @@ export const listOrderMine = () => async (dispatch, getState) => {
     }
 }
 
-export const listOrders = () => async (dispatch, getState) => {
+export const listOrders = ({seller = ''}) => async (dispatch, getState) => {
     console.log("ACTION: listOrders")
     dispatch({type: ORDER_LIST_REQUEST})
     const {userSignin: {userInfo}} = getState()
     try {
-        const {data} = await axios.get('/api/orders/', {headers: { Authorization: `Bearer ${userInfo.token}`}})
+        const {data} = await axios.get(`/api/orders?seller=${seller}`, {headers: { Authorization: `Bearer ${userInfo.token}`}})
         dispatch({type: ORDER_LIST_SUCCESS, payload: data})
     } catch(error){
         const message = error.response && error.response.data.message ? error.response.data.message : error.message

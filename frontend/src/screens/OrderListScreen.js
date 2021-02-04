@@ -8,14 +8,18 @@ import { ORDER_DELETE_RESET } from '../constants/orderConstants'
 
 
 export default function OrderListScreen(props) {
+    const sellerMode = props.match.path.indexOf('/seller') >= 0
     const orderList = useSelector(state => state.orderList)
     const {loading, error, orders } = orderList
     const dispatch = useDispatch()
     const orderDelete = useSelector(state => state.orderDelete)
     const { loading: loadingDelete, error: errorDelete, success: successDelete} = orderDelete
+    const userSignin = useSelector((state) => state.userSignin)
+    const {userInfo} = userSignin
+    
     useEffect(() => {
         dispatch({type: ORDER_DELETE_RESET})
-        dispatch(listOrders())
+        dispatch(listOrders({ seller: sellerMode ? userInfo._id: ''}))
         
         
     },[dispatch, successDelete])

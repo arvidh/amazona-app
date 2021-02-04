@@ -19,6 +19,10 @@ import ProductListScreen from './screens/ProductListScreen'
 import AdminRoute from './components/AdminRoute'
 import ProductEditScreen from './screens/ProductEditScreen'
 import OrderListScreen from './screens/OrderListScreen'
+import UserListScreen from './screens/UserListScreen'
+import UserEditScreen from './screens/UserEditScreen'
+import SellerRoute from './components/SellerRoute'
+import SellerScreen from './screens/SellerScreen'
 
 function App() {
 
@@ -34,7 +38,7 @@ function App() {
   function brand(){
     return (
       <div>
-        < Link className="brand" to="/">amazona</Link>
+        < Link className="brand" to="/">OddBits Webshop</Link>
       </div>
     )
   }
@@ -98,6 +102,24 @@ function App() {
     )
   }
 
+  function seller_dropdown(){
+    return (
+      <div className="dropdown">
+        <Link to="#admin">Seller {' '} 
+          <i className="fa fa-caret-down"></i>
+        </Link>
+        <ul className="dropdown-content">
+          <li>
+            <Link to="/productlist/seller">Products</Link>
+          </li>
+          <li>
+            <Link to="/orderlist/seller">Orders</Link>
+          </li>
+        </ul>
+      </div>
+    )
+  }
+
   return (
     <BrowserRouter>
       <div className="grid-container">
@@ -106,12 +128,14 @@ function App() {
           <div>
             {cart_button()}
             {userInfo ? user_dropdown() :  signin_button()}
+            {userInfo && userInfo.isSeller && seller_dropdown()}
             {userInfo && userInfo.isAdmin && admin_dropdown()}
           </div>
         </header>
         <main>
+          <Route path="/seller/:id" component={SellerScreen}></Route>
           <Route path="/cart/:id?/:qty?" component = {CartScreen}></Route>
-          <Route path="/product/:id" component={ProductScreen} exact></Route>
+          <Route path="/product/:id" exact component={ProductScreen}></Route>
           <Route path="/product/:id/edit" component={ProductEditScreen} exact></Route>
           <Route path="/signin" component={SigninScreen}></Route>
           <Route path="/register" component={RegisterScreen}></Route>
@@ -121,8 +145,12 @@ function App() {
           <Route path="/order/:id" component={OrderScreen}></Route>
           <Route path="/orderhistory" component={OrderHistoryScreen}></Route>
           <PrivateRoute path="/profile" component={ProfileScreen}></PrivateRoute>
-          <AdminRoute path="/productList" component={ProductListScreen}></AdminRoute>
-          <AdminRoute path="/orderlist" component={OrderListScreen}></AdminRoute>
+          <AdminRoute path="/productlist" exact component={ProductListScreen}></AdminRoute>
+          <AdminRoute path="/orderlist" exact component={OrderListScreen}></AdminRoute>
+          <AdminRoute path="/userlist" component={UserListScreen}></AdminRoute>
+          <AdminRoute path="/user/:id/edit" component={UserEditScreen}></AdminRoute>
+          <SellerRoute path="/productlist/seller" component={ProductListScreen}></SellerRoute>
+          <SellerRoute path="/orderlist/seller" component={OrderListScreen}></SellerRoute>
           <Route exact path="/" component={HomeScreen}></Route>
         </main>
         <footer className="row center">All right reserved</footer>

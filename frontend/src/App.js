@@ -1,5 +1,5 @@
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {BrowserRouter, Link, Route} from 'react-router-dom'
 import { signout } from './actions/userActions'
@@ -23,9 +23,14 @@ import UserListScreen from './screens/UserListScreen'
 import UserEditScreen from './screens/UserEditScreen'
 import SellerRoute from './components/SellerRoute'
 import SellerScreen from './screens/SellerScreen'
+import SearchBox from './components/SearchBox'
+import SearchScreen from './screens/SearchScreen'
+import { listProductCategories } from './actions/productActions'
+import LoadingBox from './components/LoadingBox'
+import MessageBox from './components/MessageBox'
 
 function App() {
-
+  const [sidebarIsOpen, setSidebarIsOpen] = useState(false)
   const cart = useSelector(state => state.cart)
   const {cartItems} = cart
   const userSignin = useSelector((state) => state.userSignin)
@@ -34,12 +39,24 @@ function App() {
   const signoutHandler = () => {
     dispatch(signout())
   }
+  const productCategoryList = useSelector(state => state.productCategoryList)
+  const {loading: loadingCategories, error: errorCategories, categories } = productCategoryList
+  useEffect(() => {
+    dispatch(listProductCategories())
+  }, [dispatch])
+
+
+  function hamburger_menu_button(){
+    return (
+        <button type="button" className="open-sidebar" onClick={() => setSidebarIsOpen(true)}>
+          <i className="fa fa-bars"> </i>
+        </button>
+    )
+  }
 
   function brand(){
     return (
-      <div>
-        < Link className="brand" to="/">OddBits Webshop</Link>
-      </div>
+      <Link className="brand" to="/"> OddBits Webshop </Link>
     )
   }
 
@@ -120,11 +137,46 @@ function App() {
     )
   }
 
+  function categories_list(){
+    return(
+      <ul className="categories">
+            <li>
+              <strong>Categories</strong>
+              <button
+                onClick={() => setSidebarIsOpen(false)}
+                className="close-sidebar"
+                type="button"
+              >
+                <i className="fa fa-close"></i>
+              </button>
+            </li>
+            {
+                        loadingCategories ? ( <LoadingBox> </LoadingBox> ) : 
+                        errorCategories ? (<MessageBox variant="danger">{errorCategories}</MessageBox>) :
+                        (
+                          categories.map((c) => (
+                            <li key={c}>
+                              <Link to={`/search/category/${c}`}
+                              onClick={() => setSidebarIsOpen(false)}>{c}</Link>
+                            </li>
+                          ))
+                        )
+            }
+          </ul>
+    )
+  }
+
   return (
     <BrowserRouter>
       <div className="grid-container">
         <header className="row">
-          {brand()}
+          <div>
+            {hamburger_menu_button()}
+            {brand()}
+          </div>
+          <div>
+            <Route render={({ history }) => ( <SearchBox history={history}></SearchBox> )}></Route>
+          </div>
           <div>
             {cart_button()}
             {userInfo ? user_dropdown() :  signin_button()}
@@ -132,10 +184,13 @@ function App() {
             {userInfo && userInfo.isAdmin && admin_dropdown()}
           </div>
         </header>
+        <aside className={sidebarIsOpen ? 'open' : '' }>
+          {categories_list()}
+        </aside>
         <main>
           <Route path="/seller/:id" component={SellerScreen}></Route>
           <Route path="/cart/:id?/:qty?" component = {CartScreen}></Route>
-          <Route path="/product/:id" exact component={ProductScreen}></Route>
+          <Route exact path="/product/:id" component={ProductScreen}></Route>
           <Route path="/product/:id/edit" component={ProductEditScreen} exact></Route>
           <Route path="/signin" component={SigninScreen}></Route>
           <Route path="/register" component={RegisterScreen}></Route>
@@ -145,18 +200,23 @@ function App() {
           <Route path="/order/:id" component={OrderScreen}></Route>
           <Route path="/orderhistory" component={OrderHistoryScreen}></Route>
           <PrivateRoute path="/profile" component={ProfileScreen}></PrivateRoute>
-          <AdminRoute path="/productlist" exact component={ProductListScreen}></AdminRoute>
-          <AdminRoute path="/orderlist" exact component={OrderListScreen}></AdminRoute>
+          <AdminRoute exact path="/productlist" component={ProductListScreen}></AdminRoute>
+          <AdminRoute exact path="/orderlist" component={OrderListScreen}></AdminRoute>
           <AdminRoute path="/userlist" component={UserListScreen}></AdminRoute>
           <AdminRoute path="/user/:id/edit" component={UserEditScreen}></AdminRoute>
           <SellerRoute path="/productlist/seller" component={ProductListScreen}></SellerRoute>
           <SellerRoute path="/orderlist/seller" component={OrderListScreen}></SellerRoute>
           <Route exact path="/" component={HomeScreen}></Route>
+          <Route exact path="/search/name/:name?" component={SearchScreen}></Route>
+          <Route exact path="/search/category/:category" component={SearchScreen}></Route>
+          <Route exact path="/search/category/:category/name/:name" component={SearchScreen}></Route>
+          <Route exact path="/search/category/:category/name/:name/min/:min/max/:max/rating/:rating/order/:order" component={SearchScreen}></Route>
+
         </main>
         <footer className="row center">All right reserved</footer>
       </div>
     </BrowserRouter>
-  );
+  )
 }
 
-export default App;
+export default App

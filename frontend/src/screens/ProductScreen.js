@@ -47,8 +47,9 @@ export default function ProductScreen(props){
         if (comment && rating) {
             dispatch(createReview(productId, {rating, comment, name: userInfo.name}))
         }
+        else if (!rating)  alert('Please enter rating.')
         else {
-            alert('Please enter comment')
+            alert('Please enter comment.')
         }
     }
 

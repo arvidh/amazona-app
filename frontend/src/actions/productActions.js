@@ -1,5 +1,11 @@
 import axios from 'axios'
-import { PRODUCT_CATEGORY_LIST_REQUEST, PRODUCT_DELETE_REQUEST, PRODUCT_DELETE_FAIL, PRODUCT_DELETE_SUCCESS, PRODUCT_UPDATE_SUCCESS, PRODUCT_UPDATE_FAIL, PRODUCT_UPDATE_REQUEST, PRODUCT_LIST_SUCCESS, PRODUCT_LIST_FAIL, PRODUCT_DETAILS_SUCCESS, PRODUCT_DETAILS_FAIL, PRODUCT_CREATE_REQUEST, PRODUCT_CREATE_FAIL, PRODUCT_CREATE_SUCCESS, PRODUCT_CATEGORY_LIST_SUCCESS, PRODUCT_CATEGORY_LIST_FAIL, PRODUCT_LIST_REQUEST, PRODUCT_DETAILS_REQUEST} from "../constants/productConstants"
+import {PRODUCT_CATEGORY_LIST_REQUEST, PRODUCT_DELETE_REQUEST, PRODUCT_DELETE_FAIL, PRODUCT_DELETE_SUCCESS, 
+    PRODUCT_UPDATE_SUCCESS, PRODUCT_UPDATE_FAIL, PRODUCT_UPDATE_REQUEST, PRODUCT_LIST_SUCCESS, 
+    PRODUCT_LIST_FAIL, PRODUCT_DETAILS_SUCCESS, PRODUCT_DETAILS_FAIL, PRODUCT_CREATE_REQUEST, 
+    PRODUCT_CREATE_FAIL, PRODUCT_CREATE_SUCCESS, PRODUCT_CATEGORY_LIST_SUCCESS, 
+    PRODUCT_CATEGORY_LIST_FAIL, PRODUCT_LIST_REQUEST, PRODUCT_DETAILS_REQUEST, 
+    PRODUCT_REVIEW_CREATE_REQUEST, PRODUCT_REVIEW_CREATE_SUCCESS, PRODUCT_REVIEW_CREATE_FAIL} 
+    from "../constants/productConstants"
 
 export const listProducts = ({seller = '', name='', category = '', order = '', min = 0, max = 0, rating = 0}) => async (dispatch) => {
     console.log("ACTION: listProducts")
@@ -94,5 +100,24 @@ export const listProductCategories = () => async (dispatch) => {
     }
     catch(error){
         dispatch({type: PRODUCT_CATEGORY_LIST_FAIL, payload: error.message })
+    }
+}
+
+export const createReview = (productId, review) => async (dispatch, getState) => {
+    dispatch({type: PRODUCT_REVIEW_CREATE_REQUEST})
+    const { userSignin:{userInfo}} = getState()
+    try {
+        const {data} = await axios.post(`/api/products/${productId}/reviews`, review, { headers: {Authorization: `Bearer ${userInfo.token}`}})
+        dispatch({
+            type: PRODUCT_REVIEW_CREATE_SUCCESS,
+            payload: data.review
+        })
+    }
+    catch (error){
+        dispatch({
+            type: PRODUCT_REVIEW_CREATE_FAIL, 
+            payload: error.response && error.response.data.message ?
+                error.response.data.message : error.message
+        })
     }
 }

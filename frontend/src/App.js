@@ -56,7 +56,7 @@ function App() {
 
   function brand(){
     return (
-      <Link className="brand" to="/"> OddBits Webshop </Link>
+      <Link className="brand" to="/"> Lundazon </Link>
     )
   }
 

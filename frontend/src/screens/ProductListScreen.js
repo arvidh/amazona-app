@@ -1,15 +1,17 @@
 
 import { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
+import { Link, useParams } from "react-router-dom"
 import { createProduct, deleteProduct, listProducts } from "../actions/productActions"
 import LoadingBox from "../components/LoadingBox"
 import MessageBox from "../components/MessageBox"
 import { PRODUCT_CREATE_RESET, PRODUCT_DELETE_RESET } from "../constants/productConstants"
 
 export default function ProductListScreen(props) {
+    const {pageNumber = 1} = useParams()
     const sellerMode = props.match.path.indexOf('/seller') >= 0
     const productList = useSelector(state => state.productList)
-    const {loading, error, products} = productList
+    const {loading, error, products, page, pages} = productList
     const productCreate = useSelector(state => state.productCreate)
     const {loading: loadingCreate, error: errorCreate, success: successCreate, product: createdProduct} = productCreate
     const dispatch = useDispatch()
@@ -17,6 +19,7 @@ export default function ProductListScreen(props) {
     const {loading: loadingDelete, error: errorDelete, success: successDelete} = productDelete
     const userSignin = useSelector((state) => state.userSignin)
     const {userInfo} = userSignin
+
     useEffect(() => {
         if (successCreate) {
             dispatch({type: PRODUCT_CREATE_RESET})
@@ -25,8 +28,8 @@ export default function ProductListScreen(props) {
         if (successDelete) {
             dispatch({type: PRODUCT_DELETE_RESET})
         }
-        dispatch(listProducts({ seller: sellerMode ? userInfo._id: ''}))
-    }, [createdProduct, dispatch, props.history, sellerMode, successCreate, successDelete])
+        dispatch(listProducts({ seller: sellerMode ? userInfo._id : '', pageNumber}))
+    }, [pageNumber, createdProduct, dispatch, props.history, sellerMode, successCreate, successDelete, userInfo._id])
 
     
     const deleteHandler = (product) => {
@@ -49,6 +52,7 @@ export default function ProductListScreen(props) {
 
     const table = () => {
         return (
+            <>
             <table className="table">
                 <thead>
                     <tr>
@@ -88,6 +92,20 @@ export default function ProductListScreen(props) {
                     ))}
                 </tbody>
             </table>
+            { pagination() }
+            </>
+        )
+    }
+
+    const pagination = () => {
+        return (
+        <div className="row center pagination">
+            {
+                [...Array(pages).keys()].map(x => (
+                    <Link className={x + 1 === page ? 'active' : ''} key={x + 1} to={`/productlist/pageNumber/${x+1}`}>{x + 1}</Link>
+                ))
+            }
+        </div>
         )
     }
 
@@ -104,8 +122,11 @@ export default function ProductListScreen(props) {
             {
                 loading ? <LoadingBox></LoadingBox>
                 : error ? <MessageBox variant="danger">{error}</MessageBox>
-                : table()
+                : table() 
+               
+
             }
+         
 		</div>
 	)
 

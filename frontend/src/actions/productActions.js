@@ -7,12 +7,24 @@ import {PRODUCT_CATEGORY_LIST_REQUEST, PRODUCT_DELETE_REQUEST, PRODUCT_DELETE_FA
     PRODUCT_REVIEW_CREATE_REQUEST, PRODUCT_REVIEW_CREATE_SUCCESS, PRODUCT_REVIEW_CREATE_FAIL} 
     from "../constants/productConstants"
 
-export const listProducts = ({seller = '', name='', category = '', order = '', min = 0, max = 0, rating = 0}) => async (dispatch) => {
-    console.log("ACTION: listProducts")
+export const listProducts = ({
+        pageNumber = '',
+        seller = '', 
+        name='', 
+        category = '', 
+        order = '', 
+        min = 0, 
+        max = 0, 
+        rating = 0
+    }) => async (dispatch) => {
+    console.log("ACTION: listProducts 1")
     dispatch({type: PRODUCT_LIST_REQUEST})
     try {
-        const { data } = await axios.get(`/api/products?seller=${seller}&name=${name}&category=${category}&min=${min}&max=${max}&rating=${rating}&order=${order}`)
+        console.log("ACTION: listProducts 2")
+        const { data } = await axios.get(`/api/products?pageNumber=${pageNumber}&seller=${seller}&name=${name}&category=${category}&min=${min}&max=${max}&rating=${rating}&order=${order}`)
+        console.log("ACTION: listProducts 3")
         dispatch({type: PRODUCT_LIST_SUCCESS, payload: data})
+        console.log("ACTION: listProducts 4")
     }
     catch(error){
         dispatch({type: PRODUCT_LIST_FAIL, payload: error.message })

@@ -28,6 +28,7 @@ import SearchScreen from './screens/SearchScreen'
 import { listProductCategories } from './actions/productActions'
 import LoadingBox from './components/LoadingBox'
 import MessageBox from './components/MessageBox'
+import MapScreen from './screens/MapScreen'
 
 function App() {
   const [sidebarIsOpen, setSidebarIsOpen] = useState(false)
@@ -151,16 +152,16 @@ function App() {
               </button>
             </li>
             {
-                        loadingCategories ? ( <LoadingBox> </LoadingBox> ) : 
-                        errorCategories ? (<MessageBox variant="danger">{errorCategories}</MessageBox>) :
-                        (
-                          categories.map((c) => (
-                            <li key={c}>
-                              <Link to={`/search/category/${c}`}
-                              onClick={() => setSidebarIsOpen(false)}>{c}</Link>
-                            </li>
-                          ))
-                        )
+              loadingCategories ? ( <LoadingBox> </LoadingBox> ) : 
+              errorCategories ? (<MessageBox variant="danger">{errorCategories}</MessageBox>) :
+              (
+                categories.map((c) => (
+                  <li key={c}>
+                    <Link to={`/search/category/${c}`}
+                    onClick={() => setSidebarIsOpen(false)}>{c}</Link>
+                  </li>
+                ))
+              )
             }
           </ul>
     )
@@ -200,7 +201,10 @@ function App() {
           <Route path="/order/:id" component={OrderScreen}></Route>
           <Route path="/orderhistory" component={OrderHistoryScreen}></Route>
           <PrivateRoute path="/profile" component={ProfileScreen}></PrivateRoute>
+          <PrivateRoute path="/map" component={MapScreen}></PrivateRoute>
           <AdminRoute exact path="/productlist" component={ProductListScreen}></AdminRoute>
+          <AdminRoute exact path="/productlist/pageNumber/:pageNumber" component={ProductListScreen}></AdminRoute>
+
           <AdminRoute exact path="/orderlist" component={OrderListScreen}></AdminRoute>
           <AdminRoute path="/userlist" component={UserListScreen}></AdminRoute>
           <AdminRoute path="/user/:id/edit" component={UserEditScreen}></AdminRoute>
@@ -210,8 +214,7 @@ function App() {
           <Route exact path="/search/name/:name?" component={SearchScreen}></Route>
           <Route exact path="/search/category/:category" component={SearchScreen}></Route>
           <Route exact path="/search/category/:category/name/:name" component={SearchScreen}></Route>
-          <Route exact path="/search/category/:category/name/:name/min/:min/max/:max/rating/:rating/order/:order" component={SearchScreen}></Route>
-
+          <Route exact path="/search/category/:category/name/:name/min/:min/max/:max/rating/:rating/order/:order/pageNumber/:pageNumber" component={SearchScreen}></Route>
         </main>
         <footer className="row center">All right reserved</footer>
       </div>
